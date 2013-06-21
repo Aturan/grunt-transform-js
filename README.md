@@ -58,6 +58,7 @@ transform: {
 				},
 				files: [
 					{
+					//use remote file
 						src: 'http://code.jquery.com/jquery-2.0.2.min.js',
 						dest: 'tmp/jquery/2.0.2/jquery.js'
 					},
