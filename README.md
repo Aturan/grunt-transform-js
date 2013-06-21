@@ -38,14 +38,14 @@ transform: {
 			/**
 			 * use remote file as src
 			 * format:
-			 * ```
+			 * ---------
 			 * src: [remote file]
 			 * dest: [dest]
-			 * ```
+			 * ---------
 			 * or
-			 * ```
+			 * ---------
 			 * [dest]: [remote file]
-			 * ```
+			 * ---------
 			 * it look like operate local file that have not use 'expand'
 			 * tips: additional properties cannot be specified if want to src form remote file
 			 *
