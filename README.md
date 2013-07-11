@@ -31,6 +31,9 @@ code header of generated script file if not configuration `shim`
 ####shim
 code shim, usage see example below
 
+####tmp Default: `true`
+if this is true, the remote file will be cache(path is `.grunt/grunt-transform-js`)
+
 
 ## Usage Examples
 > see `Gruntfile.js`

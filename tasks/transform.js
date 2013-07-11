@@ -8,7 +8,9 @@ module.exports = function (grunt) {
 		//异步执行
 		var done = this.async();
 		var ep = new EventProxy();
-		var options = this.options();
+		var options = this.options({
+			tmp: true
+		});
 
 		var separator = grunt.util.normalizelf('\n');
 
@@ -47,9 +49,9 @@ module.exports = function (grunt) {
 			else {
 				setTimeout(function() {
 					srcList.forEach(function(src) {
-							asyncReadFile(src, read.group('transform', function(body) {
+							asyncReadFile(src, options.tmp, read.group('transform', function(body) {
 								grunt.log.verbose.write('GET: ' + src + '...').ok();
-								return {src: src, code: body};
+								return {src: src, code: shim(body, src)};
 							}));
 					});
 				}, 0);
@@ -69,8 +71,8 @@ module.exports = function (grunt) {
 				}).join(', ');
 				grunt.log.write(srcList).write(' -> ' + fileObj.dest + '...').ok();
 				grunt.file.write(fileObj.dest, body);
+				ep.emit('end', true);
 			});
-			ep.emitLater('end', true);
 		}, this);
 
 		ep.after('end', this.files.length, function () {
@@ -84,18 +86,18 @@ module.exports = function (grunt) {
 	}
 
 	//读取远程/本地文件
-	function asyncReadFile(path, callback) {
+	function asyncReadFile(path, tmp, callback) {
 		if (isRemoteFile(path)) {
 			var crypto = require('crypto');
 			var tmpPath = crypto.createHash('md5').update(path).digest('hex');
 			tmpPath = '.grunt/grunt-transform-js/' + tmpPath;
-			if (grunt.file.exists(tmpPath)) {
+			if (tmp && grunt.file.exists(tmpPath)) {
 				callback(null, grunt.file.read(tmpPath));
 			}
 			else {
 				request(path, function (err, res, body) {
 					if (!err && +res.statusCode === 200) {
-						grunt.file.write(tmpPath, body);
+						tmp && grunt.file.write(tmpPath, body);
 						callback(null, body);
 					}
 					else {

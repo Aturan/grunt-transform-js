@@ -9,7 +9,8 @@ module.exports = function (grunt) {
 			all: ['Gruntfile.js', 'tasks/*.js', '<%= nodeunit.tests %>']
 		},
 		clean: {
-			tests: ['tmp']
+			tests: ['tmp'],
+			tmp: ['.grunt']
 		},
 		nodeunit: {
 			tests: ['test/*_test.js']
@@ -21,13 +22,14 @@ module.exports = function (grunt) {
 			 */
 			jquery: {
 				options: {
+					tmp: false,
 					header: 'define(function() {',
 					footer: 'return $.noConflict(true);\n});'
 				},
 				files: [
 					{
 						//use remote file
-						src: ['test/fixtures/jquery-1.10.1.min.js'],
+						src: ['http://code.jquery.com/jquery-2.0.2.min.js'],
 						dest: 'tmp/jquery/2.0.2/'
 					}
 				]
@@ -68,5 +70,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.registerTask('test', ['jshint', 'clean', 'transform', 'nodeunit']);
-	grunt.registerTask('default', ['clean', 'transform:jquery']);
+	grunt.registerTask('default', ['clean:tmp', 'transform:jquery']);
 };
