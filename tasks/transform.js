@@ -1,20 +1,18 @@
 'use strict';
 var request = require("request"),
-	path = require("path"),
-	fs = require('fs'),
-	util = require('util'),
-	EventProxy = require('eventproxy');
+	util = require('util');
 
 module.exports = function (grunt) {
 	grunt.registerMultiTask('transform', 'grunt-transform-js', function () {
+		var EventProxy = require('eventproxy');
 		//异步执行
 		var done = this.async();
 		var ep = new EventProxy();
 		var options = this.options();
-		//source code与transform info的分隔符
+
+		var separator = grunt.util.normalizelf('\n');
 
 		var shim = typeof options.shim === 'function' ? options.shim : function(code) {
-			var separator = grunt.util.normalizelf('\n');
 			if (options.header === null || options.header === undefined) {
 				options.header = '';
 			}
@@ -25,54 +23,91 @@ module.exports = function (grunt) {
 		};
 
 		this.files.forEach(function (fileObj) {
-			if (grunt.file.exists(fileObj.dest)) {
-				ep.emitLater('error', util.format('dest file(%s) is exists...', fileObj.dest));
+			var read = new EventProxy();
+			var srcList = [];
+
+			//存在本地文件，则使用local model
+			if (fileObj.src.length > 0) {
+				grunt.log.verbose.writeln('use local model');
+				srcList = fileObj.src;
 			}
-			else if (fileObj.src == null || fileObj.src.length === 0) {
-				var src = fileObj.orig.src;
-				src = src && src[0];
-				if (isRemoteFile(src)) {
-					grunt.log.writeln('read remote file:' + src);
-					readRemoteFile(src, ep.done(function (body) {
-						ep.emit('transform', body, fileObj, src);
-					}));
-				}
-				else {
-					ep.emit('over', false);
-				}
+			//否则使用remote model
+			else {
+				grunt.log.verbose.writeln('use remote model');
+				srcList = fileObj.orig.src || [];
+				srcList = srcList.filter(function(src) {
+					return isRemoteFile(src);
+				});
+			}
+
+			if (srcList.length === 0) {
+				grunt.log.verbose.write('src is empty...').error();
+				ep.emit('end', false);
 			}
 			else {
-				ep.emitLater('transform', grunt.file.read(fileObj.src[0]), fileObj, fileObj.src[0]);
+				setTimeout(function() {
+					srcList.forEach(function(src) {
+							asyncReadFile(src, read.group('transform', function(body) {
+								grunt.log.verbose.write('GET: ' + src + '...').ok();
+								return {src: src, code: body};
+							}));
+					});
+				}, 0);
 			}
+
+			read.on('error', function(error) {
+				grunt.log.verbose.write('GET: ' + error.path + '...').error();
+				read.emit('request', {src: error.path, code: ''});
+			});
+
+			read.after('transform', srcList.length, function(data) {
+				var body = data.reduce(function(preValue, value) {
+					return preValue + separator + ((value.code !== undefined && value.code !== null) ? value.code : '');
+				}, '');
+				var srcList = data.map(function(value) {
+					return value.src;
+				}).join(', ');
+				grunt.log.write(srcList).write(' -> ' + fileObj.dest + '...').ok();
+				grunt.file.write(fileObj.dest, body);
+			});
+			ep.emitLater('end', true);
 		}, this);
 
-		ep.on('transform', function (body, fileObj, srcPath) {
-			grunt.file.write(fileObj.dest, shim(body));
-			grunt.log.write(util.format('%s => %s...', srcPath, fileObj.dest)).ok();
-			ep.emit('over', true);
-		});
-		ep.on('error', function (err) {
-			grunt.log.write(err + '...').error();
-			ep.emit('over', false);
-		});
-		ep.after('over', this.files.length, function () {
-			ep.unbind();
+		ep.after('end', this.files.length, function () {
 			done();
 		});
+
 	});
-};
-//helper
-function isRemoteFile(filename) {
-	return (/(?:file|https?):\/\/([a-z0-9\-]+\.)+[a-z0-9]{2,4}.*$/).test(filename);
-}
-function readRemoteFile(path, callback) {
-	request(path, function (err, res, body) {
-		if (!err && +res.statusCode === 200) {
-			callback(null, body);
+
+	function isRemoteFile(filename) {
+		return (/(?:file|https?):\/\/([a-z0-9\-]+\.)+[a-z0-9]{2,4}.*$/).test(filename);
+	}
+
+	//读取远程/本地文件
+	function asyncReadFile(path, callback) {
+		if (isRemoteFile(path)) {
+			var crypto = require('crypto');
+			var tmpPath = crypto.createHash('md5').update(path).digest('hex');
+			tmpPath = '.grunt/grunt-transform-js/' + tmpPath;
+			if (grunt.file.exists(tmpPath)) {
+				callback(null, grunt.file.read(tmpPath));
+			}
+			else {
+				request(path, function (err, res, body) {
+					if (!err && +res.statusCode === 200) {
+						grunt.file.write(tmpPath, body);
+						callback(null, body);
+					}
+					else {
+						callback({err: err, path: path});
+					}
+				});
+			}
 		}
 		else {
-			callback(util.format('read file(%s) error: %s', path, err));
+			var body = grunt.file.read(path);
+			callback(null, body);
 		}
-	});
-}
+	}
 
+};

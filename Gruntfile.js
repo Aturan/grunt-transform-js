@@ -9,27 +9,15 @@ module.exports = function (grunt) {
 			all: ['Gruntfile.js', 'tasks/*.js', '<%= nodeunit.tests %>']
 		},
 		clean: {
-			tests: ['tmp', '.grunt']
+			tests: ['tmp']
 		},
 		nodeunit: {
 			tests: ['test/*_test.js']
 		},
 		transform: {
 			/**
-			 * use remote file as src
-			 * format:
-			 * ```
-			 * src: [remote file]
-			 * dest: [dest]
-			 * ```
-			 * or
-			 * ```
-			 * [dest]: [remote file]
-			 * ```
-			 * it look like operate local file that have not use 'expand'
-			 * tips: additional properties cannot be specified if want to src form remote file
-			 *
-			 * use local file is the same as other grunt plugin
+			 * About files format, if in remote model(src is remote file), it is not support use 'expand',
+			 * and only support two field what 'src' and 'desc'
 			 */
 			jquery: {
 				options: {
@@ -39,13 +27,8 @@ module.exports = function (grunt) {
 				files: [
 					{
 						//use remote file
-						src: 'http://code.jquery.com/jquery-2.0.2.min.js',
-						dest: 'tmp/jquery/2.0.2/jquery.js'
-					},
-					{
-						//use local file
-						src:'test/fixtures/src/jquery-1.10.1.min.js',
-						dest:'tmp/jquery/1.10.1/jquery.js'
+						src: ['test/fixtures/jquery-1.10.1.min.js'],
+						dest: 'tmp/jquery/2.0.2/'
 					}
 				]
 			},
@@ -85,5 +68,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.registerTask('test', ['jshint', 'clean', 'transform', 'nodeunit']);
-	grunt.registerTask('default', ['clean', 'transform']);
+	grunt.registerTask('default', ['clean', 'transform:jquery']);
 };
