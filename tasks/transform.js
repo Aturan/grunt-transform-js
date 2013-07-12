@@ -9,7 +9,7 @@ module.exports = function (grunt) {
 		var done = this.async();
 		var ep = new EventProxy();
 		var options = this.options({
-			tmp: true
+			force: true
 		});
 
 		var separator = grunt.util.normalizelf('\n');
@@ -49,7 +49,7 @@ module.exports = function (grunt) {
 			else {
 				setTimeout(function() {
 					srcList.forEach(function(src) {
-							asyncReadFile(src, options.tmp, read.group('transform', function(body) {
+							asyncReadFile(src, !options.force, read.group('transform', function(body) {
 								grunt.log.verbose.write('GET: ' + src + '...').ok();
 								return {src: src, code: shim(body, src)};
 							}));

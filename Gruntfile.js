@@ -17,12 +17,13 @@ module.exports = function (grunt) {
 		},
 		transform: {
 			/**
-			 * About files format, if in remote model(src is remote file), it is not support use 'expand',
-			 * and only support two field what 'src' and 'desc'
+			 * if Local file exists in 'src', it will be called as local model, if not will be called as remote model.
+			 * If remote model, it is not support use 'expand', only support two field what 'src' and 'desc'.
+			 * 'src' only support one model of local model and remote model.
 			 */
 			jquery: {
 				options: {
-					tmp: false,
+					force: false,
 					header: 'define(function() {',
 					footer: 'return $.noConflict(true);\n});'
 				},
