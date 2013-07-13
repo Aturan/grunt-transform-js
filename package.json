@@ -1,7 +1,7 @@
 {
   "name": "grunt-transform-js",
   "description": "Transform javascript to specify module format such as cmd module.",
-  "version": "0.1.5",
+  "version": "0.2.1",
   "homepage": "https://github.com/Aturan/grunt-transform-js",
   "author": "Aturan <wioanfe@gmail.com> (http://www.aturan.me)",
   "repository": {
