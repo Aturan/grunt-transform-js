@@ -9,8 +9,7 @@ module.exports = function (grunt) {
 			all: ['Gruntfile.js', 'tasks/*.js', '<%= nodeunit.tests %>']
 		},
 		clean: {
-			tests: ['tmp'],
-			tmp: ['.grunt']
+			tests: ['tmp', '.grunt']
 		},
 		nodeunit: {
 			tests: ['test/*_test.js']
@@ -23,7 +22,7 @@ module.exports = function (grunt) {
 			 */
 			jquery: {
 				options: {
-					force: false,
+					temp: false,
 					header: 'define(function() {',
 					footer: 'return $.noConflict(true);\n});'
 				},
@@ -52,6 +51,8 @@ module.exports = function (grunt) {
 			},
 			underscore: {
 				options: {
+					temp: true,
+					package: 'http://underscorejs.org/package.json',
 					shim: function(code) {
 						return [
 							'define(function() {',
@@ -62,7 +63,7 @@ module.exports = function (grunt) {
 					}
 				},
 				src: 'http://underscorejs.org/underscore.js',
-				dest: 'tmp/underscore/1.4.4/underscore.js'
+				dest: 'tmp/underscore/{version}/underscore.js'
 			}
 		}
 	});
@@ -71,5 +72,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.registerTask('test', ['jshint', 'clean', 'transform', 'nodeunit']);
-	grunt.registerTask('default', ['clean:tmp', 'transform:jquery']);
+	grunt.registerTask('default', ['clean', 'transform:underscore']);
 };
