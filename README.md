@@ -41,36 +41,37 @@ code header of generated script file if not configuration `shim`
 code shim, usage see example below
 
 
-####force
+####temp
 
-Default: `true`
+Default: `false`
 
-if this is false, the remote file will be cache(path is `.grunt/grunt-transform-js`)
+if this is true, the remote file will be cache(path is `.grunt/grunt-transform-js`)
 
 
-####package
+####pkg
 
 **only support remote model**
 
-Value is `package.json` url, and can be used by `{propertyName}` in `src` or `dest`
+For `package.json` url, and can be used by `{propertyName}` in `src` or `dest`
 
 ```js
 {
 	underscore: {
 		options: {
-			package: 'http://underscorejs.org/package.json'
+			pkg: 'http://underscorejs.org/package.json'
 		},
-		src: 'http://code.jquery.com/jquery-1.10.2.js',
+		src: 'http://underscorejs.org/underscore.js',
 		dest: 'tmp/underscore/{version}/underscore.js'
 	}
 }
 ```
 
+## The local/remote model
+if Local file exists in 'src', it will be called as local model, if not will be called as remote model.
 
-## Usage Examples
+If remote model, it is not support use 'expand', only support two field what 'src' and 'desc'.
 
-> see `Gruntfile.js`
-
+'src' only support one type of model for local model or remote model.
 
 ## Contributing
 

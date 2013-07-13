@@ -9,7 +9,7 @@ module.exports = function (grunt) {
 		var ep = new EventProxy();
 		var options = this.options({
 			temp: false,
-			package: ''
+			pkg: ''
 		});
 
 		var separator = grunt.util.normalizelf('\n');
@@ -39,12 +39,12 @@ module.exports = function (grunt) {
 				grunt.log.verbose.writeln('use remote model');
 				srcList = fileObj.orig.src || [];
 
-				if (isRemoteFile(options.package)) {
-					grunt.log.verbose.write('Read package.json: ' + options.package + '...');
+				if (isRemoteFile(options.pkg)) {
+					grunt.log.write('Read package.json: ' + options.pkg + '...');
 					var request = new EventProxy();
-					asyncReadFile(options.package, request.doneLater('json'));
+					asyncReadFile(options.pkg, request.doneLater('json'));
 					request.on('json', function(json) {
-						grunt.log.verbose.ok();
+						grunt.log.ok();
 						try {
 							json = JSON.parse(json);
 						}
@@ -55,8 +55,8 @@ module.exports = function (grunt) {
 						read.emit('parseTpl', srcList, json);
 					});
 					request.fail(function() {
-						grunt.log.verbose.error();
-						read.emit('get', srcList);
+						grunt.log.error();
+						ep.emit('end', false);
 					});
 				}
 				else {
@@ -96,7 +96,7 @@ module.exports = function (grunt) {
 
 			read.after('transform', srcList.length, function(data) {
 				var body = data.reduce(function(preValue, value) {
-					return preValue + separator + ((value.code !== undefined && value.code !== null) ? value.code : '');
+					return preValue + ((value.code !== undefined && value.code !== null) ? value.code : '') + separator;
 				}, '');
 				var srcList = data.map(function(value) {
 					return value.src;

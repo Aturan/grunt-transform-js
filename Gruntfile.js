@@ -15,44 +15,28 @@ module.exports = function (grunt) {
 			tests: ['test/*_test.js']
 		},
 		transform: {
-			/**
-			 * if Local file exists in 'src', it will be called as local model, if not will be called as remote model.
-			 * If remote model, it is not support use 'expand', only support two field what 'src' and 'desc'.
-			 * 'src' only support one model of local model and remote model.
-			 */
 			jquery: {
 				options: {
-					temp: false,
+					temp: true,
 					header: 'define(function() {',
 					footer: 'return $.noConflict(true);\n});'
 				},
 				files: [
 					{
 						//use remote file
-						src: ['http://code.jquery.com/jquery-2.0.2.min.js'],
-						dest: 'tmp/jquery/2.0.2/'
+						src: ['http://code.jquery.com/jquery-2.0.2.js', 'http://code.jquery.com/jquery-migrate-1.2.1.js'],
+						dest: 'tmp/jquery/2.0.2/jquery.js'
+					},
+					{
+						//use local file
+						src: ['test/fixtures/jquery-1.10.1.js', 'test/fixtures/jquery-migrate-1.2.1.js'],
+						dest: 'tmp/jquery/1.10.1/jquery.js'
 					}
 				]
 			},
-			migrate: {
-				options: {
-					shim: function(code) {
-						return [
-							'define(function(require) {',
-							'var jQuery = require("$");',
-							code,
-							'return $;',
-							'});'
-						].join('\n');
-					}
-				},
-				src: 'http://code.jquery.com/jquery-migrate-1.2.1.js',
-				dest: 'tmp/jquery-migrate/1.2.1/jquery-migrate.js'
-			},
 			underscore: {
 				options: {
-					temp: true,
-					package: 'http://underscorejs.org/package.json',
+					pkg: 'https://raw.github.com/jashkenas/underscore/1.5.1/package.json',
 					shim: function(code) {
 						return [
 							'define(function() {',
@@ -72,5 +56,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.registerTask('test', ['jshint', 'clean', 'transform', 'nodeunit']);
-	grunt.registerTask('default', ['clean', 'transform:underscore']);
+	grunt.registerTask('default', ['clean', 'transform']);
 };
