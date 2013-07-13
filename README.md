@@ -79,9 +79,11 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
-2013.06.21 -- 0.1.5 -- first version
+2013.07.13 -- 0.2.2 -- fix Readme.md
 
 2013.07.13 -- 0.2.1 -- support package.json in remote model
+
+2013.06.21 -- 0.1.5 -- first version
 
 ## License
 
