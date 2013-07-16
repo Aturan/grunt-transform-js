@@ -29,7 +29,7 @@ module.exports = function (grunt) {
 					},
 					{
 						//use local file
-						src: ['test/fixtures/jquery-1.10.1.js', 'test/fixtures/jquery-migrate-1.2.1.js'],
+						src: ['test/fixtures/jquery-1.10.1.min.js', 'test/fixtures/jquery-migrate-1.2.1.js'],
 						dest: 'tmp/jquery/1.10.1/jquery.js'
 					}
 				]
@@ -46,7 +46,7 @@ module.exports = function (grunt) {
 						].join('\n');
 					}
 				},
-				src: 'http://underscorejs.org/underscore.js',
+				src: 'https://raw.github.com/jashkenas/underscore/{version}/underscore.js',
 				dest: 'tmp/underscore/{version}/underscore.js'
 			}
 		}

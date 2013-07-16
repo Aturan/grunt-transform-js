@@ -8842,9 +8842,6 @@ if ( typeof window === "object" && typeof window.document === "object" ) {
 
 })( window );
 
-return $.noConflict(true);
-});
-define(function() {
 /*!
  * jQuery Migrate - v1.2.1 - 2013-05-08
  * https://github.com/jquery/jquery-migrate
@@ -9366,6 +9363,7 @@ jQuery.each( ajaxEvents.split("|"),
 
 
 })( jQuery, window );
+
 
 return $.noConflict(true);
 });

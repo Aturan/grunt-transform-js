@@ -83,7 +83,7 @@ module.exports = function (grunt) {
 					srcList.forEach(function(src) {
 						asyncReadFile(src, options.temp, read.group('transform', function(body) {
 							grunt.log.verbose.write('GET: ' + src + '...').ok();
-							return {src: src, code: shim(body, src)};
+							return {src: src, code: body};
 						}));
 					});
 				}
@@ -98,6 +98,7 @@ module.exports = function (grunt) {
 				var body = data.reduce(function(preValue, value) {
 					return preValue + ((value.code !== undefined && value.code !== null) ? value.code : '') + separator;
 				}, '');
+				body = shim(body);
 				var srcList = data.map(function(value) {
 					return value.src;
 				}).join(', ');
